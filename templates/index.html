@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro de Aprendices</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        input {
+            display: block;
+            margin: 10px 0;
+            padding: 8px;
+            width: 300px;
+        }
+
+        button {
+            padding: 10px 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 80%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Centro de Biotecnología Agropecuaria</h1>
+
+<h2>Registro de Aprendices</h2>
+
+<form action="/registrar" method="POST">
+
+    <input type="text" name="nombre_completo" placeholder="Nombre completo" required>
+
+    <input type="text" name="numero_documento" placeholder="Número de documento" required>
+
+    <input type="text" name="ficha" placeholder="Número de ficha" required>
+
+    <button type="submit">Registrar</button>
+
+</form>
+
+
+<h2>Aprendices registrados</h2>
+
+<table>
+
+<tr>
+    <th>ID</th>
+    <th>Nombre</th>
+    <th>Documento</th>
+    <th>Ficha</th>
+    <th>Fecha</th>
+</tr>
+
+{% for aprendiz in aprendices %}
+
+<tr>
+    <td>{{ aprendiz.id }}</td>
+    <td>{{ aprendiz.nombre_completo }}</td>
+    <td>{{ aprendiz.numero_documento }}</td>
+    <td>{{ aprendiz.ficha }}</td>
+    <td>{{ aprendiz.creado_en }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>

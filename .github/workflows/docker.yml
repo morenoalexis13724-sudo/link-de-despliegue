@@ -1,0 +1,20 @@
+name: Docker Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Construir imagen Backend
+        run: docker build -t mi-backend:test .
+
+      - name: Construir imagen Frontend
+        run: docker build -t mi-frontend:test ./frontend

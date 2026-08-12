@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Biotecnología Agropecuaria</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1>Centro de Biotecnología Agropecuaria</h1>
+
+    <h2>Registro de Aprendices</h2>
+
+    <form id="registroForm">
+        <input
+            type="text"
+            id="nombre_completo"
+            placeholder="Nombre completo"
+            required
+        >
+
+        <input
+            type="text"
+            id="numero_documento"
+            placeholder="Número de documento"
+            required
+        >
+
+        <input
+            type="text"
+            id="ficha"
+            placeholder="Número de ficha"
+            required
+        >
+
+        <button type="submit">Registrar</button>
+    </form>
+
+    <h2>Aprendices registrados</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Documento</th>
+                <th>Ficha</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+
+        <tbody id="tablaAprendices">
+        </tbody>
+    </table>
+
+    <script>
+        const API = "http://localhost:5050";
+
+        async function cargarAprendices() {
+            try {
+                const respuesta = await fetch(`${API}/api/aprendices`);
+                const aprendices = await respuesta.json();
+
+                const tabla = document.getElementById("tablaAprendices");
+                tabla.innerHTML = "";
+
+                aprendices.forEach(aprendiz => {
+                    const fila = document.createElement("tr");
+
+                    fila.innerHTML = `
+                        <td>${aprendiz.id}</td>
+                        <td>${aprendiz.nombre_completo}</td>
+                        <td>${aprendiz.numero_documento}</td>
+                        <td>${aprendiz.ficha}</td>
+                        <td>${aprendiz.creado_en}</td>
+                    `;
+
+                    tabla.appendChild(fila);
+                });
+
+            } catch (error) {
+                console.error("Error al cargar aprendices:", error);
+            }
+        }
+
+        document.getElementById("registroForm").addEventListener("submit", async function(evento) {
+            evento.preventDefault();
+
+            const datos = {
+                nombre_completo: document.getElementById("nombre_completo").value,
+                numero_documento: document.getElementById("numero_documento").value,
+                ficha: document.getElementById("ficha").value
+            };
+
+            try {
+                const respuesta = await fetch(`${API}/api/aprendices`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(datos)
+                });
+
+                if (!respuesta.ok) {
+                    throw new Error("No se pudo registrar el aprendiz");
+                }
+
+                this.reset();
+                cargarAprendices();
+
+            } catch (error) {
+                console.error("Error al registrar:", error);
+                alert("No se pudo registrar el aprendiz.");
+            }
+        });
+
+        cargarAprendices();
+    </script>
+
+</body>
+</html>

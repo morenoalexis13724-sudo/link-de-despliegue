@@ -1,0 +1,47 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: servidor-bd
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  backend:
+    image: alexismoreno1234/mi-aplicacion-local:v5
+    container_name: app-backend
+    depends_on:
+      - db
+    ports:
+      - "5050:5050"
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+
+  frontend:
+    image: alexismoreno1234/mi-frontend:v3
+    container_name: app-frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+  nginx:
+    image: nginx:alpine
+    container_name: servidor-nginx
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+volumes:
+  mysql_data:
