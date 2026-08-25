@@ -27,12 +27,13 @@ jobs:
           tags: alexismoreno1234/proyecto:latest
 
       - name: Desplegar en servidor cloud
-        uses: easingthemes/ssh-deploy@v2.1.5
+        uses: easingthemes/ssh-deploy@v5.1.0
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            cd -/DockerFlaskDesplegado
-            docker-compose pull app-backend
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+          REMOTE_USER: ubuntu
+          TARGET: /home/ubuntu/link-de-despliegue/
+          SCRIPT_AFTER: |
+            cd /home/ubuntu/link-de-despliegue
+            docker-compose pull
             docker-compose up -d
