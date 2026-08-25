@@ -1,9 +1,9 @@
-name: publicar imagene en Docker Hub
+name: publicar imagen en Docker Hub
 
 on:
   push:
-    branches: [ "main","master" ]
-  workflow_dispatch:  
+    branches: ["main", "master"]
+  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -14,28 +14,25 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Iniciar sesión en Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Construir y subir imagen
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: morenopablo/proyecto:latest
+          tags: alexismoreno1234/proyecto:latest
 
       - name: Desplegar en servidor cloud
         uses: easingthemes/ssh-deploy@v2.1.5
         with:
           host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER}}
+          username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-           cd -/DockerFlaskDesplegado
-           docker-compose pull app-backend
-           docker-compose up -d
-          
-              
-  
+            cd -/DockerFlaskDesplegado
+            docker-compose pull app-backend
+            docker-compose up -d
