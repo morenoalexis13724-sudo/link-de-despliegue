@@ -5,7 +5,7 @@ services:
     restart: always
     ports:
       - "80:80" #Http
-      - "81:81" #administracion de la API
+      - "81:81" #Administración de la API
       - "443:443" #Https
     volumes:
       - ./npm_data:/data
@@ -15,39 +15,46 @@ services:
 
   servidor-bd:
     image: mysql:8.0
-    container_name: servidor-bd
-    restart: always
-
+    container_name: servidor-bd-ejemplo
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-
-    ports:
-      - "3306:3306"
-
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
-      - mysql_data:/var/lib/mysql
-
+      - mysql-data:/var/lib/mysql
     networks:
       - red-cba
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   app-backend:
-    image: spl4shsc4r/proyecto-app-flask:latest
-
-    container_name: app-backend
-
-    ports:
-      - "5050:5050"
-
-    depends_on:
-      - servidor-bd
-
+    image: morenoalexis13724-sudo/link-de-despliegue:latest
+    container_name: app-backend-ejemplo
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
+      FLASK_ENV: development
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    networks:
+      - red-cba
+    depends_on:
+      servidor-bd:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5050/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: always
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime-kuma-data:/app/data
     networks:
       - red-cba
 
@@ -56,4 +63,7 @@ networks:
     name: red-cba-ejemplo
 
 volumes:
-  mysql_data:
+  mysql-data:
+    name: mysql-data
+  uptime-kuma-data:
+    name: uptime-kuma-data
