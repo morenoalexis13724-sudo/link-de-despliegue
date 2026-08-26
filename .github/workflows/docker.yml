@@ -27,7 +27,7 @@ jobs:
 
       - name: Ejecutar pruebas con pytest
         run: |
-          pytest test_sample.py
+          pytest 
 
 
 
