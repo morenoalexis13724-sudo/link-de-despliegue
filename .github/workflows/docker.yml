@@ -6,11 +6,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  #ejecutar pruebas
+
+  #EJECUTAR PRUEBAS
+
   test:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: secreta_adso_123
+          MYSQL_DATABASE: adso_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -psecreta_adso_123"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
+
       - name: Descargar código
         uses: actions/checkout@v4
 
@@ -25,19 +42,39 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
-      - name: Ejecutar pruebas con pytest
+      - name: Instalar cliente MySQL
         run: |
-          pytest 
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
 
+      - name: Esperar a MySQL
+        run: |
+          for i in {1..30}; do
+            mysqladmin ping -h 127.0.0.1 -uroot -psecreta_adso_123 && break
+            sleep 2
+          done
 
+      - name: Crear tabla de aprendices
+        run: |
+          mysql -h 127.0.0.1 -uroot -psecreta_adso_123 adso_db < init.sql
 
+      - name: Ejecutar pruebas con pytest
+        env:
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASSWORD: secreta_adso_123
+          DB_NAME: adso_db
+        run: |
+          pytest
 
-  #contruir y desplegar
+  # CONSTRUIR Y DESPLEGAR
+
   build-and-push:
     needs: test
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Descargar código
         uses: actions/checkout@v4
 
