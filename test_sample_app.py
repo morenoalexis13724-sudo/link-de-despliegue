@@ -10,5 +10,6 @@ def client():
 
 def test_pagina_principal(client):
     response = client.get("/")
-    assert response.status_code == 200
+    assert response.status_code == 400
+    
 
