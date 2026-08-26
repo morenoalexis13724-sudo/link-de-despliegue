@@ -40,7 +40,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
+          pip install bandit
+
+      - name: Escaneor de seguridad (bandit)
+        run: bandit -r . -s B101
 
       - name: Instalar cliente MySQL
         run: |
@@ -88,8 +91,23 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
+          push: false
+          load: true
+          no-cache: true
           tags: alexismoreno1234/proyecto:latest
+      - name: Escanear contenedor con Trivy
+        uses: aquasecurity/trivy-action@v0.9.2
+        with:
+          image-ref: alexismoreno1234/proyecto:latest
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Subir imagen a Docker Hub
+        run: docker push alexismoreno1234/proyecto:latest
+              
 
       - name: Desplegar en servidor cloud
         uses: easingthemes/ssh-deploy@v5.1.0
