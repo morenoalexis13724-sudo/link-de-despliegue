@@ -4,15 +4,14 @@ services:
     container_name: proxy-manager
     restart: always
     ports:
-      - "80:80" #Http
-      - "81:81" #Administración de la API
-      - "443:443" #Https
+      - "80:80"
+      - "81:81"
+      - "443:443"
     volumes:
       - ./npm_data:/data
       - ./npm_letsencrypt:/etc/letsencrypt
     depends_on:
-      app_backend:
-         condition: service_healthy
+      - app-backend
     networks:
       - red-cba
 
@@ -22,8 +21,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWWORD: ${DB_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
@@ -37,20 +38,19 @@ services:
   app-backend:
     image: morenoalexis13724-sudo/link-de-despliegue:latest
     container_name: app-backend-ejemplo
+    ports:
+      - "5050:5050"
     environment:
       FLASK_ENV: development
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     networks:
       - red-cba
     depends_on:
       servidor-bd:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:5050/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
   uptime-kuma:
     image: louislam/uptime-kuma:1
