@@ -42,8 +42,8 @@ jobs:
           pip install -r requirements.txt
           pip install bandit
 
-      - name: Escaneor de seguridad (bandit)
-        run: bandit -r . -s B101
+      - name: Escaneo de seguridad (bandit)
+        run: bandit -r . -x .venv -s B101
 
       - name: Instalar cliente MySQL
         run: |
