@@ -1,18 +1,18 @@
-FROM python:3.13-slim
+FROM python:3.12-alpine
 
 WORKDIR /home/myapp
 
+RUN apk update && apk upgrade
+
 COPY requirements.txt .
 
-RUN apt-get update \
-    && apt-get upgrade -y \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
+RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir "setuptools>=83.0.0" "msgpack>=1.2.1"
+    && rm -rf /usr/local/lib/python3.12/site-packages/pip \
+              /usr/local/lib/python3.12/site-packages/pip-*.dist-info
 
 COPY . .
 
 EXPOSE 5050
 
-CMD ["python", "sample_app.py"]
+CMD ["python3", "sample_app.py"]

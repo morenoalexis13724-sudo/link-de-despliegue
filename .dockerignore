@@ -2,4 +2,12 @@
 __pycache__
 *.pyc
 .git
+.gitignor.venv
+__pycache__
+*.pyc
+.git
 .gitignore
+.env
+npm_data
+.pytest_cache
+*.swp

@@ -63,6 +63,20 @@ services:
     networks:
       - red-cba
 
+
+  dozzle:
+   image: amir20/dozzleilatest
+   container_name: dozzle
+   restart: always
+   volumes:
+    -/var/run/docker.sock/var/run/ docker.sock
+   ports:
+    -"8080.8080"
+   networks:
+   - red-cba
+   
+
+
 networks:
   red-cba:
     name: red-cba-ejemplo
